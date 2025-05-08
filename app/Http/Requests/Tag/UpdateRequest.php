@@ -22,7 +22,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string',
+            'title' => 'required|min:3|max:20',
         ];
     }
 }

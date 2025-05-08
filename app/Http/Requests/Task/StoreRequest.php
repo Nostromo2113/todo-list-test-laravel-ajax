@@ -22,7 +22,7 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required',
+            'title' => 'required|min:3|max:20',
             'text' => 'nullable|max:200',
             'tags' => 'nullable|array',
             'tags.*' => 'integer|exists:tags,id',
