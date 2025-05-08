@@ -269,7 +269,6 @@ async function logNewPosition(draggedItem) {
 
     try {
         await api.update('tasks', taskId, { position: newPosition }, true);
-        loadTasks();
     } catch (error) {
         console.error(error);
         alert('Не удалось обновить позицию');
