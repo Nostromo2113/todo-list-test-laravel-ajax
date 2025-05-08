@@ -29,6 +29,18 @@
    - Метод получения токена пользователя по логину и паролю.
    - API доступно только при наличии валидного токена.
 
+### Curl 
+    Пример запроса curl
+    После регистрации
+    curl -X POST http://127.0.0.1:8000/api/login \
+     -H "Content-Type: application/json" \
+     -d "{\"email\":\"user@example.com\",\"password\":\"password\"}"
+
+![Логин](https://i.postimg.cc/Gh2HtY4y/2025-05-08-17-26-51.png)
+![Таски](https://i.postimg.cc/ncPMDzmw/2025-05-08-17-28-04.pngg)
+![Post запрос](https://i.postimg.cc/FHkzg4gF/2025-05-08-17-28-58.png)
+
+
 ### Инструкция по установке проекта
 
 
@@ -68,10 +80,4 @@
 
     Затем запустите сервер:
     php artisan serve
-
-    Пример запроса curl
-    После регистрации
-    curl -X POST http://127.0.0.1:8000/api/login \
-     -H "Content-Type: application/json" \
-     -d "{\"email\":\"user@example.com\",\"password\":\"password\"}"
-
+```
