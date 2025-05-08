@@ -61,7 +61,9 @@ function renderTasks(tasks) {
         <div class="card mb-3 task-card"
              id="task-${task.id}"
              data-id="${task.id}"
-             draggable="true">
+             draggable="true"
+             style="cursor: pointer"
+             >
             <div class="card-body">
                 <div class="d-flex align-items-center mb-2">
                     <strong class="me-2">#${task.id}</strong>
