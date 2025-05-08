@@ -18,7 +18,6 @@ export default {
     },
 
     store(entity, taskData) {
-        console.warn(taskData)
         const token = localStorage.getItem('token');
         return fetch(`/api/${entity}`, {
             method: 'POST',
