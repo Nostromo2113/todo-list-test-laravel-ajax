@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // Привязка событий к кнопкам
     document.getElementById('loginBtn').addEventListener('click', login);
     document.getElementById('registerBtn').addEventListener('click', register);
 });
