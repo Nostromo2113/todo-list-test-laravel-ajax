@@ -30,8 +30,7 @@
    - API доступно только при наличии валидного токена.
 
 ### Curl 
-    Пример запроса curl
-    После регистрации
+    Запрос токена
     curl -X POST http://127.0.0.1:8000/api/login \
      -H "Content-Type: application/json" \
      -d "{\"email\":\"user@example.com\",\"password\":\"password\"}"
