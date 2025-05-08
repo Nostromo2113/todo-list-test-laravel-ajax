@@ -217,8 +217,6 @@ function showDeleteModal(id) {
 function resetForm() {
     document.getElementById('taskForm').reset();
     document.getElementById('taskId').value = '';
-    document.querySelector('#taskForm button[type="submit"]').textContent = 'Save Task';
-    document.querySelector('#taskForm button[type="button"]').style.display = 'none';
 }
 
 // ====================== DRAG AND DROP ======================
