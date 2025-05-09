@@ -235,6 +235,7 @@ function enableDragAndDrop() {
     container.addEventListener('dragover', e => {
         e.preventDefault();
         const dragging = container.querySelector('.dragging');
+        if (!dragging) return;
         const afterElement = getDragAfterElement(container, e.clientY);
 
         if (afterElement) {
@@ -262,16 +263,33 @@ function getDragAfterElement(container, y) {
     });
 }
 
-async function logNewPosition(draggedItem) {
-    const cards = document.querySelectorAll('.task-card');
-    const newPosition = Array.from(cards).findIndex(card => card === draggedItem);
-    const taskId = draggedItem.dataset.id;
+const logNewPosition = (() => {
+    let isRunning = false;
+    let timeoutId = null;
+    const delay = 200;
 
-    try {
-        await api.update('tasks', taskId, { position: newPosition }, true);
-    } catch (error) {
-        console.error(error);
-        alert('Не удалось обновить позицию');
-        window.location.reload();
-    }
-}
+    return function(draggedItem) {
+        if (isRunning) return;
+
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(async () => {
+            if (isRunning) return;
+            isRunning = true;
+
+            const cards = document.querySelectorAll('.task-card');
+            const newPosition = Array.from(cards).findIndex(card => card === draggedItem);
+            const taskId = draggedItem.dataset.id;
+
+            try {
+                await api.update('tasks', taskId, { position: newPosition }, true);
+                loadTasks();
+            } catch (error) {
+                console.error(error);
+                alert('Не удалось обновить позицию');
+                window.location.reload();
+            } finally {
+                isRunning = false;
+            }
+        }, delay);
+    };
+})();
