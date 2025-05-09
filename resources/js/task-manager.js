@@ -228,7 +228,7 @@ function enableDragAndDrop() {
     container.addEventListener('dragstart', e => {
         if (e.target.classList.contains('task-card')) {
             draggedItem = e.target;
-            e.target.classList.add('dragging');
+            e.target.classList.add('dragging', 'border', 'border-primary', 'shadow-lg', 'bg-light');
         }
     });
 
@@ -247,7 +247,7 @@ function enableDragAndDrop() {
 
     container.addEventListener('dragend', () => {
         if (draggedItem) {
-            draggedItem.classList.remove('dragging');
+            draggedItem.classList.remove('dragging', 'border', 'border-primary', 'shadow-lg', 'bg-light');
             logNewPosition(draggedItem);
             draggedItem = null;
         }
