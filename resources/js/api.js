@@ -1,54 +1,94 @@
 export default {
-    index(entity) {
+    async index(entity) {
         const token = localStorage.getItem('token');
-        return fetch(`/api/${entity}`, {
+        const res = await fetch(`/api/${entity}`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
             }
-        }).then(res => res.json());
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message);
+        }
+
+        return res.json();
     },
 
-    show(entity, id) {
+    async show(entity, id) {
         const token = localStorage.getItem('token');
-        return fetch(`/api/${entity}/${id}`, {
+        const res = await fetch(`/api/${entity}/${id}`, {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
             }
-        }).then(res => res.json());
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message);
+        }
+
+        return res.json();
     },
 
-    store(entity, taskData) {
+    async store(entity, taskData) {
         const token = localStorage.getItem('token');
-        return fetch(`/api/${entity}`, {
+        const res = await fetch(`/api/${entity}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
             },
             body: JSON.stringify(taskData)
-        }).then(res => res.json());
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message);
+        }
+
+        return res.json();
     },
 
-    update(entity, id, taskData, position = false) {
-        const path = position ? `api/${entity}/${id}/position` : `api/${entity}/${id}`;
+    async update(entity, id, taskData, position = false) {
+        const path = position ? `/api/${entity}/${id}/position` : `/api/${entity}/${id}`;
         const token = localStorage.getItem('token');
-        return fetch(path, {
+        const res = await fetch(path, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
             },
             body: JSON.stringify(taskData)
-        }).then(res => res.json());
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message);
+        }
+
+        return res.json();
     },
 
-    delete(entity, id) {
+    async delete(entity, id) {
         const token = localStorage.getItem('token');
-        return fetch(`/api/${entity}/${id}`, {
+        const res = await fetch(`/api/${entity}/${id}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/json'
             }
-        }).then(res => res.json());
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message);
+        }
+
+        return res.json();
     }
-}
+};
