@@ -13,14 +13,12 @@ class TaskPositionController extends Controller
 
     public function update(PositionRequest $request, Task $task): JsonResponse
     {
+        $this->authorize('update', $task);
+
         $user = auth()->user();
         $data = $request->validated();
         $oldPosition = $task->position;
         $newPosition = $data['position'];
-
-        if ($task->user_id !== $user->id) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
-        }
 
         if ($oldPosition === $newPosition) {
             return response()->json(['success' => true, 'message' => 'Position unchanged']);
