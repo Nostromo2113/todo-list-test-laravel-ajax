@@ -286,7 +286,7 @@ const logNewPosition = (() => {
             } catch (error) {
                 console.error(error);
                 alert('Не удалось обновить позицию');
-                window.location.reload();
+                loadTasks();
             } finally {
                 isRunning = false;
             }

@@ -13,31 +13,35 @@ class TaskPositionController extends Controller
 
     public function update(PositionRequest $request, Task $task): JsonResponse
     {
-        $this->authorize('update', $task);
-
+        $user = auth()->user();
         $data = $request->validated();
+        $oldPosition = $task->position;
+        $newPosition = $data['position'];
 
-        DB::transaction(function () use ($data, $task): void {
-            $oldPosition = $task->position;
-            $newPosition = $data['position'];
+        if ($task->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
 
-            if ($oldPosition < $newPosition) {
-                Task::where('position', '>', $oldPosition)
-                    ->where('position', '<=', $newPosition)
-                    ->decrement('position');
-            } elseif ($oldPosition > $newPosition) {
-                Task::where('position', '>=', $newPosition)
+        if ($oldPosition === $newPosition) {
+            return response()->json(['success' => true, 'message' => 'Position unchanged']);
+        }
+
+        DB::transaction(function () use ($oldPosition, $newPosition, $task, $user) {
+            if ($newPosition < $oldPosition) {
+                $user->tasks()
+                    ->where('position', '>=', $newPosition)
                     ->where('position', '<', $oldPosition)
                     ->increment('position');
+            } elseif ($newPosition > $oldPosition) {
+                $user->tasks()
+                    ->where('position', '<=', $newPosition)
+                    ->where('position', '>', $oldPosition)
+                    ->decrement('position');
             }
 
-            $task->position = $newPosition;
-            $task->save();
+            $task->update(['position' => $newPosition]);
         });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Position updated'
-        ]);
+        return response()->json(['success' => true, 'message' => 'Position updated']);
     }
 }
