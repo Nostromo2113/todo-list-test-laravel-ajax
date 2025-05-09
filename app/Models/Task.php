@@ -21,7 +21,8 @@ class Task extends Model
     protected static function booted()
     {
         static::creating(function ($task) {
-            $task->position = static::max('position') + 1;
+            $max = static::max('position');
+            $task->position = is_null($max) ? 0 : $max + 1;
         });
     }
 }
