@@ -13,6 +13,8 @@ class TaskPositionController extends Controller
 
     public function update(PositionRequest $request, Task $task): JsonResponse
     {
+        $this->authorize('update', $task);
+
         $data = $request->validated();
 
         DB::transaction(function () use ($data, $task): void {

@@ -44,10 +44,7 @@ class TaskController extends Controller
 
     public function update(UpdateRequest $request, Task $task): JsonResponse
     {
-        // Желательно использовать политики. Я их активно использую в своем проекте, но ради одной проверки посчитал избыточным
-        if ($task->user_id !== auth()->id()) {
-            abort(403, 'You are not authorized to update this task.');
-        }
+        $this->authorize('update', $task);
 
         $data = $request->validated();
 
@@ -65,6 +62,8 @@ class TaskController extends Controller
 
     public function destroy(Task $task): JsonResponse
     {
+        $this->authorize('delete', $task);
+
         $task->delete();
 
         return response()->json(['message' => 'Task deleted']);
