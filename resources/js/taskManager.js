@@ -1,4 +1,6 @@
 import api from './api';
+import {renderTask} from "./renderTask.js";
+import { enableDragAndDrop } from './dragAndDrop';
 
 // ====================== ИНИЦИАЛИЗАЦИЯ ======================
 
@@ -6,7 +8,7 @@ document.addEventListener('DOMContentLoaded', loadTasks);
 
 // ====================== ОБРАБОТЧИКИ СОБЫТИЙ ======================
 
-document.addEventListener('click', function (e) {
+document.addEventListener('click', function(e) {
     // Кнопка редактирования задачи
     if (e.target.classList.contains('editTaskBtn')) {
         const id = e.target.dataset.id;
@@ -31,18 +33,19 @@ document.addEventListener('click', function (e) {
     }
 });
 // Отправка формы
-document.getElementById('taskForm').addEventListener('submit', function (e) {
+document.getElementById('taskForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const taskId = document.getElementById('taskId').value;
     taskId ? updateTask() : createTask();
 });
+
 
 // ====================== ОСНОВНЫЕ ФУНКЦИИ ======================
 
 async function loadTasks() {
     try {
         const tasks = await api.index('tasks');
-        if (Array.isArray(tasks) && tasks.length > 0) {
+        if (tasks.length > 0) {
             renderTasks(tasks);
         } else {
             document.getElementById('tasksList').innerHTML = '<div class="alert alert-info">No tasks found</div>';
@@ -51,46 +54,37 @@ async function loadTasks() {
         console.error(error);
         alert('Ошибка загрузки задач');
     }
-    loadTagsToSelect();
+    addTagsToSelect();
 }
 
 function renderTasks(tasks) {
+    let dragAndDropInitialized = false;
     const container = document.getElementById('tasksList');
+    container.innerHTML = '';
+    tasks.forEach((task) => {
+        renderTask(task);
+    })
 
-    container.innerHTML = tasks.map(task => `
-        <div class="card mb-3 task-card"
-             id="task-${task.id}"
-             data-id="${task.id}"
-             draggable="true"
-             style="cursor: pointer"
-             >
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                    <strong class="me-2">#${task.id}</strong>
-                    <h5 class="card-title mb-0">${task.title}</h5>
-                </div>
-                <p class="card-text">${task.text || 'No description'}</p>
-                <div class="mb-2">
-                    ${task.tags.map(tag => `
-                        <span class="badge bg-primary tag-badge">${tag.title}</span>
-                    `).join('')}
-                </div>
-                <button class="btn btn-sm btn-warning editTaskBtn" data-id="${task.id}">Edit</button>
-                <button class="btn btn-sm btn-danger deleteTaskBtn" data-id="${task.id}">Delete</button>
-            </div>
-        </div>
-    `).join('');
-
-    enableDragAndDrop();
+    if (!dragAndDropInitialized) {
+        enableDragAndDrop();
+        dragAndDropInitialized = true;
+    }
 }
 
 // ====================== РАБОТА С ТЕГАМИ ======================
 
-async function loadTagsToSelect() {
+async function loadTags() {
     try {
         const response = await api.index('tags');
         const tags = response.data ?? response;
+        return tags;
+    } catch(e){
+        console.error(e)
+    }
+}
 
+async function addTagsToSelect() {
+        const tags= await loadTags();
         const tagsSelect = document.getElementById('tagSelector');
         tagsSelect.innerHTML = '';
 
@@ -100,10 +94,6 @@ async function loadTagsToSelect() {
             option.textContent = tag.title;
             tagsSelect.appendChild(option);
         });
-    } catch (error) {
-        console.error(error);
-        alert('Ошибка загрузки тегов');
-    }
 }
 
 // ====================== CRUD ОПЕРАЦИИ ======================
@@ -138,8 +128,7 @@ async function updateTask() {
     const text = document.getElementById('editTaskText').value;
 
     const selectedTags = Array.from(document.getElementById('editTaskTags').selectedOptions)
-        .map(option => parseInt(option.value))
-        .filter(id => !isNaN(id));
+        .map(option => parseInt(option.value));
 
     const data = {
         title: title,
@@ -176,16 +165,16 @@ async function deleteTask(id) {
 async function editTask(id) {
     try {
         const task = await api.show('tasks', id);
-        const allTags = await api.index('tags');
+        const tags = loadTags();
 
         document.getElementById('editTaskId').value = task.id;
         document.getElementById('editTaskTitle').value = task.title;
         document.getElementById('editTaskText').value = task.text || '';
 
-        const tagsSelect = document.getElementById('editTaskTags');
-        tagsSelect.innerHTML = '';
+        const tagsContainer = document.getElementById('editTaskTags');
+        tagsContainer.innerHTML = '';
 
-        allTags.forEach(tag => {
+        tags.forEach(tag => {
             const option = document.createElement('option');
             option.value = tag.id;
             option.textContent = tag.title;
@@ -193,7 +182,7 @@ async function editTask(id) {
             const isAttached = task.tags.some(t => t.id === tag.id);
             option.selected = isAttached;
 
-            tagsSelect.appendChild(option);
+            tagsContainer.appendChild(option);
         });
 
         const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
@@ -218,78 +207,3 @@ function resetForm() {
     document.getElementById('taskForm').reset();
     document.getElementById('taskId').value = '';
 }
-
-// ====================== DRAG AND DROP ======================
-
-function enableDragAndDrop() {
-    const container = document.getElementById('tasksList');
-    let draggedItem = null;
-
-    container.addEventListener('dragstart', e => {
-        if (e.target.classList.contains('task-card')) {
-            draggedItem = e.target;
-            e.target.classList.add('dragging', 'border', 'border-primary', 'shadow-lg', 'bg-light');
-        }
-    });
-
-    container.addEventListener('dragover', e => {
-        e.preventDefault();
-        const dragging = container.querySelector('.dragging');
-        if (!dragging) return;
-        const afterElement = getDragAfterElement(container, e.clientY);
-
-        if (afterElement) {
-            container.insertBefore(dragging, afterElement);
-        } else {
-            container.appendChild(dragging);
-        }
-    });
-
-    container.addEventListener('dragend', () => {
-        if (draggedItem) {
-            draggedItem.classList.remove('dragging', 'border', 'border-primary', 'shadow-lg', 'bg-light');
-            logNewPosition(draggedItem);
-            draggedItem = null;
-        }
-    });
-}
-
-function getDragAfterElement(container, y) {
-    const cards = [...container.querySelectorAll('.task-card:not(.dragging)')];
-
-    return cards.find(card => {
-        const rect = card.getBoundingClientRect();
-        return y < rect.top + rect.height / 2;
-    });
-}
-
-const logNewPosition = (() => {
-    let isRunning = false;
-    let timeoutId = null;
-    const delay = 200;
-
-    return function(draggedItem) {
-        if (isRunning) return;
-
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(async () => {
-            if (isRunning) return;
-            isRunning = true;
-
-            const cards = document.querySelectorAll('.task-card');
-            const newPosition = Array.from(cards).findIndex(card => card === draggedItem);
-            const taskId = draggedItem.dataset.id;
-
-            try {
-                await api.update('tasks', taskId, { position: newPosition }, true);
-                loadTasks();
-            } catch (error) {
-                console.error(error);
-                alert('Не удалось обновить позицию');
-                loadTasks();
-            } finally {
-                isRunning = false;
-            }
-        }, delay);
-    };
-})();
