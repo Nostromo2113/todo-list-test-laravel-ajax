@@ -1,4 +1,5 @@
 import api from './api';
+import {renderTag} from "./renderTag.js";
 
 // ====================== ИНИЦИАЛИЗАЦИЯ ======================
 
@@ -44,6 +45,7 @@ async function loadTags() {
             document.getElementById('tagsList').innerHTML = '<div class="alert alert-info">No tags found</div>';
         }
     } catch (error) {
+        console.error(error)
         alert('Ошибка загрузки тегов');
     }
 }
@@ -52,19 +54,12 @@ async function loadTags() {
 function renderTags(tags) {
     const container = document.getElementById('tagsList');
 
-    container.innerHTML = tags.map(tag => `
-        <div class="card mb-3 tag-card" id="tag-${tag.id}">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <span class="badge" style="background-color: #6c757d">${tag.title}</span>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-warning editTagBtn" data-id="${tag.id}">Edit</button>
-                    <button class="btn btn-sm btn-danger deleteTagBtn" data-id="${tag.id}">Delete</button>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    container.innerHTML = '';
+
+    tags.forEach(tag => {
+      const tagCard = renderTag(tag);
+      container.appendChild(tagCard);
+    });
 }
 
 // ====================== CRUD ОПЕРАЦИИ ======================
