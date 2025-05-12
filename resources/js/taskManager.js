@@ -42,6 +42,9 @@ document.getElementById('taskForm').addEventListener('submit', function(e) {
 
 // ====================== ОСНОВНЫЕ ФУНКЦИИ ======================
 
+/**
+ * Загружает и отображает список задач
+ */
 async function loadTasks() {
     try {
         const tasks = await api.index('tasks');
@@ -57,6 +60,10 @@ async function loadTasks() {
     addTagsToSelect();
 }
 
+/**
+ * Рендерит список задач в контейнер
+ * @param {Array} tasks - Массив задач
+ */
 function renderTasks(tasks) {
     let dragAndDropInitialized = false;
     const container = document.getElementById('tasksList');
@@ -73,6 +80,10 @@ function renderTasks(tasks) {
 
 // ====================== РАБОТА С ТЕГАМИ ======================
 
+/**
+ * Загружает список тегов с сервера
+ * @return {Promise<Array>} Массив тегов
+ */
 async function loadTags() {
     try {
         const response = await api.index('tags');
@@ -83,6 +94,9 @@ async function loadTags() {
     }
 }
 
+/**
+ * Добавляет теги в select-элемент
+ */
 async function addTagsToSelect() {
         const tags= await loadTags();
         const tagsSelect = document.getElementById('tagSelector');
@@ -98,6 +112,9 @@ async function addTagsToSelect() {
 
 // ====================== CRUD ОПЕРАЦИИ ======================
 
+/**
+ * Создает новую задачу
+ */
 async function createTask() {
     const title = document.getElementById('title').value;
     const text = document.getElementById('text').value;
@@ -122,6 +139,9 @@ async function createTask() {
     }
 }
 
+/**
+ * Обновляет существующую задачу
+ */
 async function updateTask() {
     const id = document.getElementById('editTaskId').value;
     const title = document.getElementById('editTaskTitle').value;
@@ -148,6 +168,10 @@ async function updateTask() {
     }
 }
 
+/**
+ * Удаляет задачу
+ * @param {number} id - ID задачи
+ */
 async function deleteTask(id) {
     try {
         await api.delete('tasks', id);
@@ -162,6 +186,10 @@ async function deleteTask(id) {
 
 // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
 
+/**
+ * Открывает форму редактирования задачи
+ * @param {number} id - ID задачи
+ */
 async function editTask(id) {
     try {
         const task = await api.show('tasks', id);
@@ -193,6 +221,10 @@ async function editTask(id) {
     }
 }
 
+/**
+ * Показывает модальное окно подтверждения удаления
+ * @param {number} id - ID задачи
+ */
 function showDeleteModal(id) {
     document.getElementById('deleteId').value = id;
 
@@ -202,7 +234,9 @@ function showDeleteModal(id) {
     modal.show();
 }
 
-
+/**
+ * Сбрасывает форму задачи
+ */
 function resetForm() {
     document.getElementById('taskForm').reset();
     document.getElementById('taskId').value = '';

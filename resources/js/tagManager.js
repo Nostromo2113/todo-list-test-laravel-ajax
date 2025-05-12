@@ -34,7 +34,9 @@ document.getElementById('tagForm').addEventListener('submit', function (e) {
 
 // ====================== ОСНОВНЫЕ ФУНКЦИИ ======================
 
-// Загрузка тегов
+/**
+ * Загружает и отображает список тегов
+ */
 async function loadTags() {
     try {
         const tags = await api.index('tags');
@@ -50,7 +52,10 @@ async function loadTags() {
     }
 }
 
-// Отображение тегов
+/**
+ * Рендерит список тегов в контейнер
+ * @param {Array} tags - Массив тегов
+ */
 function renderTags(tags) {
     const container = document.getElementById('tagsList');
 
@@ -64,7 +69,10 @@ function renderTags(tags) {
 
 // ====================== CRUD ОПЕРАЦИИ ======================
 
-// Создание тега
+/**
+ * Создает новый тег
+ * @param {string} type - Тип сущности ('tags')
+ */
 async function create() {
     const name = document.getElementById('tagName').value;
     const data = {
@@ -81,7 +89,11 @@ async function create() {
     }
 }
 
-// Обновление тега
+/**
+ * Обновляет существующий тег
+ * @param {string} type - Тип сущности ('tags')
+ * @param {number} id - ID тега
+ */
 async function update() {
     const id = document.getElementById('editTagId').value;
     const name = document.getElementById('editTagName').value;
@@ -102,7 +114,10 @@ async function update() {
     }
 }
 
-// Удаление тега
+/**
+ * Удаляет тег
+ * @param {number} id - ID тега
+ */
 async function deleteTag(id) {
     try {
         await api.delete('tags', id);
@@ -113,7 +128,10 @@ async function deleteTag(id) {
     }
 }
 
-// Редактирование тега
+/**
+ * Открывает форму редактирования тега
+ * @param {number} id - ID тега
+ */
 async function editTag(id) {
     try {
         const tag = await api.show('tags', id);
@@ -131,7 +149,10 @@ async function editTag(id) {
 
 // ====================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ======================
 
-// Сброс формы
+
+/**
+ * Сбрасывает форму тега
+ */
 function resetForm() {
     document.getElementById('tagForm').reset();
     document.getElementById('tagId').value = '';
